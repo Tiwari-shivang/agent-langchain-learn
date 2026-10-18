@@ -11,14 +11,14 @@ logger = logging.getLogger(__name__)
 engineLocal: AsyncEngine = create_async_engine(
     url=f"postgresql+asyncpg://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}",
     echo=False,
+    pool_size=20,
+    max_overflow=20,
+    pool_timeout=20,
     pool_pre_ping=True
 )
 
 sessionLocal: AsyncSession = async_sessionmaker(
     bind=engineLocal,
-    pool_size=20,
-    max_overflow=20,
-    pool_timeout=30,
     autoflush=False,
     expire_on_commit=False
 )
@@ -40,6 +40,7 @@ async def get_db():
         except Exception as e:
             logger.error(f"Error in db session {e.__cause__}")
             await session.rollback()
+            raise
         finally:
             logger.info("Closing db session")
-            session.close()
+            await session.close()
