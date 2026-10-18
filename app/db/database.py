@@ -6,7 +6,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 engineLocal: AsyncEngine = create_async_engine(
-    url="postgresql+asyncpg://postgres:abc123%23@localhost:5432/NSE_DB",
+    url="postgresql+asyncpg://postgres.hpkyiqzddfeflednkqrh:VBdF-a5+LJ-D-fm@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres",
     echo=False,
     pool_pre_ping=True
 )

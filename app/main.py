@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from app.api.api import router
 from contextlib import asynccontextmanager
-from app.db.database import test_db_connection, engineLocal
+from app.db.database import test_db_connection, engineLocal, get_db
 from app.db.base import Base
 from app.db import models  # Register model tables before create_all runs.
 from sqlalchemy.schema import CreateSchema
@@ -18,6 +18,8 @@ async def life_span(app: FastAPI):
             for schema in sorted({table.schema for table in Base.metadata.tables.values() if table.schema}):
                 await engine.execute(CreateSchema(schema, if_not_exists=True))
             await engine.run_sync(Base.metadata.create_all)
+        session = get_db()
+        app.state.session = session
         yield
     except Exception:
         logger.exception("Application lifespan failed")
