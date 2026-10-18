@@ -3,8 +3,10 @@ from app.api.api import router
 from contextlib import asynccontextmanager
 from app.db.database import test_db_connection, engineLocal, get_db
 from app.db.base import Base
-from app.db import models  # Register model tables before create_all runs.
+from app.db import models
 from sqlalchemy.schema import CreateSchema
+from app.core.settings import Settings
+from functools import lru_cache
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -18,8 +20,7 @@ async def life_span(app: FastAPI):
             for schema in sorted({table.schema for table in Base.metadata.tables.values() if table.schema}):
                 await engine.execute(CreateSchema(schema, if_not_exists=True))
             await engine.run_sync(Base.metadata.create_all)
-        session = get_db()
-        app.state.session = session
+        app.state.settings = get_settings()
         yield
     except Exception:
         logger.exception("Application lifespan failed")
@@ -33,5 +34,9 @@ def create_app() -> FastAPI:
     app = FastAPI(lifespan=life_span)
     app.include_router(router)
     return app
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
 
 app = create_app()

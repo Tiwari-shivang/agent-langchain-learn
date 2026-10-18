@@ -1,12 +1,15 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncEngine, AsyncSession
 from sqlalchemy import text, make_url
+from app.core.settings import get_settings
 import logging
+
+settings = get_settings()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 engineLocal: AsyncEngine = create_async_engine(
-    url="postgresql+asyncpg://postgres.hpkyiqzddfeflednkqrh:VBdF-a5+LJ-D-fm@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres",
+    url=f"postgresql+asyncpg://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}",
     echo=False,
     pool_pre_ping=True
 )
