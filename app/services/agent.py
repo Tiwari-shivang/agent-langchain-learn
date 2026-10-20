@@ -5,7 +5,7 @@ class AgentService:
     def __init__(self):
         pass
 
-    def chat_agent(self, request: QueryRequest) -> AgentResponse:
-        agent_response = llm.invoke(request.query)
-        response = AgentResponse(answer=agent_response.content)
-        return response
+    async def chat_agent(self, request: QueryRequest):
+        async for chunk in llm.astream(request.query):
+            if chunk.content:
+                yield chunk.content
