@@ -15,6 +15,11 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASSWORD: str
 
+    LLM_MODEL: str
+    LLM_TEMP: str
+    LLM_BASE_URL: str
+    LLM_API_KEY: str
+
 def get_settings():
     return Settings()
 

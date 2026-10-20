@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.users import UserCreateReq
+from app.schemas.users import UserCreateReq, UserDetails
 from app.repositories.users import UserRepository
 from app.schemas.users import SuccessResponse
 import logging
@@ -20,3 +20,13 @@ class UserService:
             logger.error(f"Error signing up: {e.__cause__}")
             raise
         return response
+    
+    async def get_user_details(self, user_id: str) -> UserDetails | None:
+        userRepo = UserRepository(session=self.session)
+        try:
+            response = await userRepo.get_user_details(user_id)
+            userDetails = UserDetails(id=response.id, first_name=response.first_name, last_name=response.last_name, email=response.email, date_of_birth=response.date_of_birth, gender=response.gender, country=response.country, city=response.city)
+            return userDetails
+        except Exception as e:
+            logger.error(f"Error while fetching details: {e.__cause__}")
+            raise

@@ -1,6 +1,8 @@
 from app.repositories.baseRepository import BaseRepository
 from app.db.models import Users
-from app.schemas.users import UserCreateReq
+from app.schemas.users import UserCreateReq, UserDetails
+from sqlalchemy import select
+from uuid import UUID
 import logging
 import bcrypt
 
@@ -32,4 +34,15 @@ class UserRepository(BaseRepository[Users]):
             self.session.rollback()
             logger.error(f"Error creating user: {e.__cause__}")
         return
+    
+    async def get_user_details(self, user_id: str) -> Users | None:
+        try:
+            stmt = select(Users).where(Users.id == UUID(user_id))
+            response = await self.session.execute(stmt)
+            return response.scalar_one_or_none()
+        except Exception as e:
+            logger.error(f"Getting error while fetching details: {e.__cause__}")
+            raise
+
+
         
